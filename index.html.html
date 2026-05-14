@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Ujian PAI - SMPN 1 Karimun</title>
+    
+    <!-- Memuat Tailwind CSS untuk tampilan -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Memuat React dan ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- Memuat Babel agar browser bisa membaca format JSX React -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-gray-100 font-sans antialiased">
+    
+    <!-- Tempat aplikasi React akan dimunculkan -->
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- DATA SOAL LENGKAP 50 NOMOR ---
+        const QUESTIONS = [
+          {
+            id: 1,
+            text: "Perhatikan Q.S Al-Mujadalah/58:11 berikut !\nيَٰٓأَيُّهَا ٱلَّذِينَ ءَامَنُوٓاْ إِذَا قِيلَ لَكُمۡ تَفَسَّحُواْ فِي ٱلۡمَجَٰلِسِ فَٱفۡسَحُواْ يَفۡسَحِ ٱللَّهُ لَكُمۡۖ وَإِذَا قِيلَ ٱنشُزُواْ فَٱنشُزُواْ يَرۡفَعِ ٱللَّهُ ٱلَّذِينَ ءَامَنُواْ مِنكُمۡ وَٱلَّذِينَ أُوتُواْ ٱلۡعِلۡمَ دَرَجَٰتٖۚ وَٱللَّهُ بِمَا تَعۡمَلُونَ خَبِيرٞ \nJumlah hukum bacaan Alif lam Qomariyah pada ayat tersebut adalah….",
+            options: ["A. 1", "B. 2", "C. 3", "D. 4"],
+            correct: 2
+          },
+          {
+            id: 2,
+            text: "Perhatikan ilustrasi dibawah ini!\nIbnu Hajar kecewa ketika belajar dengan gurunya ia tak kunjung paham, akhirnya ia pulang ke rumah. Di tengah perjalanan, hujan turun, ia berteduh dalam sebuah gua. Ia mendapati air yang menetes pada sebongkah batu yang sangat besar. Batu itu berlubang karena telah bertahun-tahun terkena tetesan air, akhirnya Ibnu Hajar merenung. Dia berpikir, batu yang besar dan keras ini lama-lama berlubang hanya karena tetesan air. Akhirnya Ia pun belajar lagi dan usaha tersebut tidak sia-sia. Dia berhasil menjadi orang alim, bahkan dapat mengarang beberapa kitab.\nBerdasarkan ilustrasi diatas, sikap Ibnu Hajar yang dapat ditiru dalam kehidupan sehari-hari adalah....",
+            options: ["A. Belajar dengan sesuka hati", "B. Belajar dengan santai", "C. Putus asa", "D. Belajar dengan sungguh-sungguh"],
+            correct: 3
+          },
+          {
+            id: 3,
+            text: "Perhatikan QS. Al-Alaq : 1 – 5 berikut \nاقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ (1) خَلَقَ الْإِنْسَانَ مِنْ عَلَقٍ (2) اقْرَأْ وَرَبُّكَ الْأَكْرَمُ (3) الَّذِي عَلَّمَ بِالْقَلَمِ (4) عَلَّمَ الْإِنْسَانَ مَا لَمْ يَعْلَمْ (5)\nAyat diatas merupakan wahyu pertama yang disampaikan Malaikat Jibril kepada Nabi Muhammad. Berikut ini yang bukan merupakan kandungan dari ayat tersebut adalah....",
+            options: ["A. Perintah Memuliakan Tuhan", "B. Anjuran untuk membaca dan menggali ilmu", "C. Penjelasan bahwa manusia tercipta dari tanah", "D. Penjelasan bahwa Allah adalah Maha Pemurah"],
+            correct: 2
+          },
+          {
+            id: 4,
+            text: "Perhatikan narasi berikut!\nIa adalah seorang ilmuwan pada masa Dinasti Abbasiyah. Ia dikenal sebagai seorang dokter. Karya bukunya yang berjudul “al-Qānūn fial-Ṭibb” dijadikan sebagai teori dasar kedokteran yang dipelajari oleh mahasiswa kedokteran di seluruh dunia. Dan beliau digelar dengan bapak kedokteran dunia.\nSosok yang dimaksudkan pada narasi adalah ....",
+            options: ["A. Al-Razi", "B. Ibnu Sina", "C. Al Khawarismi", "D. Ibnu Kaldun"],
+            correct: 1
+          },
+          {
+            id: 5,
+            text: "Perhatikan gambar di bawah ini!\nMakna yang terkandung dalam gambar di atas adalah….",
+            imageUrl: "https://i.ibb.co.com/XZgDF8HC/Screenshot-2026-04-22-134122.png",
+            options: ["A. Orang yang beriman dan berilmu pengetahuan akan diangkat derajatnya oleh Allah SWT.", "B. Tidak membedakan status seseorang, karena kedudukannya sama di hadapan Allah SWT.", "C. Memotivasi kita untuk selalu beramal saleh untuk bekal ketika meninggal dunia.", "D. Dengan sering berjama’ah di masjid bisa menambah semangat bekerja dan beribadah."],
+            correct: 0
+          },
+          {
+            id: 6,
+            text: "Perhatikan Arti Q.S Al-Mujadalah/58:11 berikut !\n“Wahai orang-orang yang beriman! Apabila dikatakan kepadamu, berilah kelapangan di dalam majelis-majelis, maka lapangkanlah, niscaya Allah SWT akan memberi kelapangan untukmu. Dan apabila dikatakan, berdirilah kamu, maka berdirilah, niscaya Allah SWT akan mengangkat derajat orang-orang yang beriman di antaramu dan orang-orang yang diberi ilmu beberapa derajat, dan Allah Mahateliti apa yang kamu kerjakan.”\nIsi kandungan ayat diatas menjelaskan tentang……….",
+            options: ["A. Perintah berbuat baik kepada orang tua", "B. Kewajiban menjauhi larangan Allah Swt", "C. Kewajiban melaksanakan sholat", "D. Derajat orang yang beriman dan berilmu pengetahuan"],
+            correct: 3
+          },
+          {
+            id: 7,
+            text: "Perhatikan tabel berikut ini tentang contoh hukum bacaan alif lam syamsiyah dan alif lam qamariyah.\n1. وَاُولِى الۡاَمۡرِ مِنۡكُم\n2. وَالرَّسُوۡلِ\n3. وَالۡيَـوۡمِ الۡاٰخِرِ‌\n4. يٰۤـاَيُّهَا الَّذِيۡنَ\nYang termasuk contoh bacaan Alif Lam Qamariyah adalah ...",
+            options: ["A. 1 dan 2", "B. 1 dan 3", "C. 2 dan 3", "D. 2 dan 4"],
+            correct: 1
+          },
+          {
+            id: 8,
+            text: "Perhatikan pernyataan-pernyataan berikut!\n1) Kemerosotan akhlak sebagian pemimpin Daulah Usmaniyah\n2) Pemimpin yang kurang amanah\n3) Melemahnya kekuatan militer\n4) Terjadi persahabatan dengan bangsa-bangsa Eropa\n5) Masyarakat Daulah Usmaniyah banyak yang enggan bertani\n6) Terjadi krisis pangan pada masa Daulah Usmaniyah\n7) Terjadinya perpecahan di dalam wilayah-wilayah\n8) Beberapa wilayah memisahkan diri dengan Usmaniyah\n9) Terdapat perebutan pengaruh dengan beberapa negara Eropa\nPernyataan tersebut, yang bukan merupakan penyebab runtuhnya Daulah Usmaniyah terdapat pada nomor ….",
+            options: ["A. 1, 2, 3", "B. 2, 3, 4", "C. 4, 5, 6", "D. 7, 8, 9"],
+            correct: 2
+          },
+          {
+            id: 9,
+            text: "Sultan Sulaiman I mendapat gelar “Al-Qonuni” atau “The Magnificent”, yang berarti ...",
+            options: ["A. Sang pemberi pengampun", "B. Yang diberkahi Allah Swt.", "C. Sang pembuat undang-undang", "D. Yang sangat bijaksana"],
+            correct: 2
+          },
+          {
+            id: 10,
+            text: "Perhatikan pernyataan berikut!\nSejak mendeklarasikan diri sebagai sebuah republik pada tahun 1923 M., Turki berubah menjadi negara yang berpaham sekuler. Paham sekuler tersebut tidak cocok diterapkan di negara Indonesia. Alasan yang paling tepat dari pernyataan tersebut adalah ….",
+            options: ["A. Indonesia adalah negara yang memiliki multi pulau, bahasa, dan suku.", "B. Indonesia telah mewajibkan semua rakyatnya agar memiliki keyakinan dan senantiasa bertakwa kepada Tuhan Yang Maha Esa.", "C. Negara Turki Usmani sangat berbeda karakter dan adat istiadatnya dengan negara Indonesia", "D. Indonesia tidak akan berkembang jika menjadi negara sekuler"],
+            correct: 1
+          },
+          {
+            id: 11,
+            text: "Perhatikan pernyataan-pernyataan berikut!\n1) Melatih para tentara secara maksimal, dan mengirimnya pada misi penaklukan Konstantinopel.\n2) Merangkul daerah-daerah yang sebelumnya sempat terlepas dari kekuasaan Daulah Usmaniyah.\n3) Membuat kesepakatan dengan negara tetangga, seperti Venesia, Magyar, dan Bosnia.\n4) Mengutus mata-mata untuk menyelidiki kekuatan dan kelemahan benteng musuh.\n5) Memberikan kontribusi terhadap persiapan kejayaan Daulah Usmaniyah pada masa kepemimpinan putranya.\nPernyataan tersebut, yang merupakan usaha Muhammad Al-Fatih dalam menaklukkan Konstantinopel ditunjukan oleh nomor ….",
+            options: ["A. 1 dan 2", "B. 2 dan 3", "C. 4 dan 5", "D. 3 dan 4"],
+            correct: 0
+          },
+          {
+            id: 12,
+            text: "Salah satu bukti bahwa para Khalifah Daulah Usmaniyah memiliki sikap toleransi beragama, kecuali ….",
+            options: ["A. Khalifah tidak memperdulikan urusan agama yang dianut oleh rakyatnya.", "B. Menetapkan Islam sebagai agama resmi, tetapi diberi kebebasan memeluk agama lainnya", "C. Memberikan kebebasan kepada masyarakat dalam memeluk agama masing masing", "D. Khalifah memfasilitasi berkembangnya agama apa pun yang ada di wilayah kedaulatannya."],
+            correct: 0
+          },
+          {
+            id: 13,
+            text: "Gelar Al-Qonuni diberikan kepada Sultan Sulaiman I, karena …",
+            options: ["A. Berjasa dalam meletakkan dasar hukum bagi Daulah Usmaniyah", "B. Berupaya mendirikan kantor pengadilan diseluruh wilayah Turki", "C. Mengangkat para khalifah yang benar-benar jujur dan adil", "D. Memberikan ampunan bagi para rakyat kecil yang lemah."],
+            correct: 0
+          },
+          {
+            id: 14,
+            text: "Perhatikan wacana berikut!\n“Usaha penaklukkan kota Konstantinopel oleh Al-Fatih memakan waktu 9 bulan, dan tepat pada 29 Mei 1453 M., kota Konstantinopel berhasil ditaklukkan. Setelah memasuki Konstantinopel, Al-Fatih memasuki sebuah gereja Hagia Sofia/Aya Sofia (saat itu dijadikan sebagai tempat perlindungan para rahib, pendeta serta masyarakat) dan Al-Fatih yang baik hati, memberikan perlindungan kepada mereka.\nDari wacana tersebut, dua nilai positif yang bisa kita teladani adalah ….",
+            options: ["A. Gotong royong dan pengorbanan", "B. Keteguhan dan keramahan", "C. Kegigihan dan toleransi", "D. Istiqomah dan kesabaran"],
+            correct: 2
+          },
+          {
+            id: 15,
+            text: "Perhatikan tabel berikut ini!\n1. Jibril - A. Membagi rizki\n2. Mikail - B. Menyampaikan wahyu\n3. Izrail - C. Penjaga surga\n4. Munkar - D. Pencatat amal buruk\n5. Atid - E. Pencatat amal baik\n6. Rakib - F. Penanya dalam kubur\n7. Israfil - G. Pencabut nyawa\n8. Ridwan - H. Penjaga neraka\n9. Malik - I. Peniup Sangkakala\nDari tabel tersebut pasangan yang tepat antara nama malaikat dan tugasnya tunjukkan nomor…",
+            options: ["A. 5 dengan A, 1 dengan F, dan 6 dengan G", "B. 3 dengan C, 2 dengan D, dan 7 dengan B", "C. 2 dengan I, 3 dengan B, dan 8 dengan C", "D. 1 dengan B, 4 dengan F, dan 9 dengan H."],
+            correct: 3
+          },
+          {
+            id: 16,
+            text: "Perhatikan Ilustrasi dibawah ini.\nBeberapa minggu yang lalu Hasan mengirim cerita pendek yang ditulisnya ke panitia lomba penulisan cerita pendek yang diadakan oleh majalah terkemuka di daerahnya. Hari ini pada saat jam istirahat, Hasan mendapat kabar dari salah satu panitia bahwa dia menjadi juara pertama. Hasan langsung melakukan sujud.\nSujud yang dilakukan Hasan adalah sujud ....",
+            options: ["A. Syukur", "B. Tilawah", "C. Sahwi", "D. Sembah"],
+            correct: 0
+          },
+          {
+            id: 17,
+            text: "Perhatikan gambar dibawah ini..\nMakna yang terkandung dalam gambar diatas adalah ....",
+            imageUrl: "https://i.ibb.co.com/9mfbDVbx/Screenshot-2026-04-22-133437.png",
+            options: ["A. Budayakan tabayun", "B. Kebebasan dalam berpendapat", "C. Kebebasan informasi", "D. Mencari sumber berita"],
+            correct: 0
+          },
+          {
+            id: 18,
+            text: "Perhatikan potongan ayat dari QS. Al- Anbiya/21: 30 berikut ini!\n.............................اَوَلَمْ يَرَ الَّذِيْنَ كَفَرُوْٓا اَنَّ السَّمٰوٰتِ\nLanjutan potongan ayat tersebut yang benar adalah….",
+            options: ["A. وَجَعَلْنَا مِنَ الْمَاۤءِ كُلَّ شَيْءٍ حَيٍّۗ", "B. وَالْاَرْضَ كَانَتَا رَتْقًا فَفَتَقْنٰهُمَاۗ", "C. ۗ تَبَارَكَ ٱللَّهُ رَبُّ ٱلْعَٰلَمِينَ", "D. ۗ اَفَلَا يُؤْمِنُوْنَ"],
+            correct: 1
+          },
+          {
+            id: 19,
+            text: "Perhatikan tabel berikut ini!\n1. Takbir - A. La ilāha illallāh\n2. Tasbih - B. Alhamdulillāh\n3. Tahmid - C. Subhānallāh\n4. Tahlil - D. Allāhu Akbar\nYang merupakan pasangan bacaan zikir yang benar adalah....",
+            options: ["A. 1-A, 2-B, 3-C, 4-D", "B. 1-B, 2-C, 3-D, 4-A", "C. 1-C, 2-D, 3-A, 4-B", "D. 1-D, 2-C, 3-B, 4-A"],
+            correct: 3
+          },
+          {
+            id: 20,
+            text: "Perhatikan pernyataan berikut!\n1) Diberikan kemudahahan pada segala urusan dalam pencapaian tujuan hidup.\n2) Menjauhkan diri dari maksiat dan penyakit hati.\n3) Mendekatkan diri kepada Allah Swt. dan menggapai rida-Nya.\n4) Mempererat silaturahmi antar sesama umat Islam.\nDi antara pernyataan tersebut, yang termasuk hikmah melaksanakan salat berjamaah adalah nomor....",
+            options: ["A. 4", "B. 3", "C. 2", "D. 1"],
+            correct: 0
+          },
+          {
+            id: 21,
+            text: "Bacalah ilustrasi berikut ini!\nAhmad mengumpulkan uang selama satu tahun. Dia bercita-cita hendak menyembelih kurban tahun ini. Setelah cukup uang, ia mencari seekor kambing terbaik untuk uang yang dikumpulkannya. Ia sudah sepakat dengan penjual kambing bahwa kambingnya akan diantar pada hari raya Idul Adha. Akan tetapi, malang tidak dapat dihindari. Pada hari raya idul adha penjual kambing tersebut jatuh sakit dan tidak dapat mengirimkan kambing tepat waktu. Ia baru dapat mengirimkan kambing tersebut sehari setelah Idul adha.\nDalam keadaan seperti ini, Ahmad sebaiknya....",
+            options: ["A. Membatalkan rencananya berkurban karena waktunya telah lewat", "B. Tetap meneruskan rencananya menyembelih kurban karena masih hari tasyrik", "C. Membatalkan rencananya membeli kambing", "D. Menyedekahkan kambingnya pada orang yang bersedia memelihara"],
+            correct: 1
+          },
+          {
+            id: 22,
+            text: "Perhatikan tata cara penyembelihan hewan secara tradisional berikut!\n1) Sembelihlah hewan sampai memutuskan saluran nafas, saluran makan dan dua urat leher hewan\n2) Arahkan pisau pada bagian leher hewan\n3) Berniat menyembelih dengan membaca basmallah dan takbir\n4) Letakkan hewan di atas lubang penampungan darah\n5) Hadapkan hewan yang akan disembelih dihadapkan ke kiblat\n6) Pegang kuat-kuat atau ikat kaki hewan\n7) Siapkan lubang penampungan darah\nUrutan penyembelihan hewan secara tradisional yang tepat adalah ….",
+            options: ["A. 3, 2, 1, 5, 7, 6, 4", "B. 3, 7, 6, 4, 5, 2, 1", "C. 7, 6, 5, 4, 2, 3, 1", "D. 7, 5, 6, 4, 3, 2, 1"],
+            correct: 3
+          },
+          {
+            id: 23,
+            text: "Menyembelih kambing / domba sebagai tanda syukur kepada Allah atas lahirnya anak. Dan dilaksanakan pada pada hari ketujuh setelah kelahiran anak adalah pengertian dari…",
+            options: ["A. Qurban", "B. Udhiyah", "C. Aqidah", "D. Aqiqah"],
+            correct: 3
+          },
+          {
+            id: 24,
+            text: "Perhatikan pernyataan berikut ini!\n1. Ada hewan yang disembelih\n2. Ada tempat untuk menyembelih\n3. Ada orang yang menyembelih\n4. Ada alat yang digunakan untuk menyembelih\nRukun penyembelihan hewan yang sesuai dengan pernyataan diatas adalah ...",
+            options: ["A. 1 – 2 - 3", "B. 1 – 3 – 4", "C. 1 – 2 – 4", "D. 2 – 3 – 4"],
+            correct: 1
+          },
+          {
+            id: 25,
+            text: "Perhatikan ilustrasi di bawah ini...\nSuatu hari Ahmad bermain ke rumah teman sekelasnya yaitu Andi. Pak Soleh, ayah Andi, seorang muslim yang murah hati. Beliau menyembelih seekor kambing untuk acara arisan keluarga. Oleh karena terbiasa menyembelih hewan, Pak Soleh sudah menyiapkan kambing untuk disembelih. Pak Soleh membaringkan kambing itu ke arah kiri. Sebelum menyembelih hewan, Pak Soleh mengajak semua yang ada di rumah ikut menyaksikan penyembelihan itu. Pak Soleh berpidato singkat kepada mereka yang menyaksikan kegiatan tersebut. “Assalamu’alaikum warahmatullahi wa barakatuh. Pagi ini kita akan menyembelih seekor kambing untuk acara arisan keluarga. Semoga acara nanti siang dapat berjalan dengan baik dan semua bisa hadir. Aamiin”. Setelah berkata Aamiin, Pak Soleh langsung menyembelih kambing tersebut. Karena pisau yang digunakan sangat tajam, kambing itu pun tidak tersiksa dan segera mati. Setelah selesai, Pak Soleh berucap syukur Alhamdulillah.\nDari ilustrasi di atas, cara penyembelihan Pak Soleh yang kurang tepat adalah...",
+            options: ["A. Sudah benar karena dilakukan dengan cepat dan tidak menyakiti", "B. Sudah benar karena dilakukan dengan niat ikhlas memuliakan tamu", "C. Tidak benar karena tidak memenuhi cara penyembelihan menurut syari’at", "D. Tidak benar karena mengajak orang lain untuk menyaksikan kegiatan tersebut"],
+            correct: 2
+          },
+          {
+            id: 26,
+            text: "Bacalah ilustrasi berikut ini!\nHendi sedang bergembira hati, istrinya melahirnya anak pertama mereka seorang bayi perempuan yang cantik. Beberapa hari kemudian, Hendi ke pasar hewan mencari kambing untuk keperluan aqiqah. Merasa tidak menemukan kambing yang cocok, Hendi berkunjung ke rumah beberapa peternak kambing. Lagi-lagi dia tidak menemukan kambing sesuai kriteria yang disyariatkan yaitu kambing yang telah cukup umur dan sehat. Akhirnya Hendi mengambil seekor kambing yang sangat besar, tetapi pincang kakinya dan buta sebelah matanya. Kambing ini adalah kambing paling besar yang ditemukannya. Hendi pun menggunakan kambing itu sebagai kambing aqiqah. Kambing pilihan Hendi tersebut…",
+            options: ["A. Boleh digunakan untuk aqiqah karena kambing terbaik yang ada", "B. Boleh digunakan karena waktu telah mendesak", "C. Tidak boleh digunakan karena terlalu besar", "D. Tidak boleh digunakan karena tidak memenuhi syarat kambing kurban/ aqiqah"],
+            correct: 3
+          },
+          {
+            id: 27,
+            text: "Bapak Husin dan ibu Hasnah dikaruniai anak pertamanya seorang anak laki-laki. Sebagai wujud rasa syukurnya, keluarga ini berniat akikah dengan cara menyembelih 20 ekor ayam untuk dimasak dan dibagikan kepada tetangga dan keluarga dekatnya. Dilihat dari kesahannya, akikah yang dilakukan oleh bapak Hasan adalah….",
+            options: ["A. sah, karena nilai ayam yang disembelih setara dengan hewan akikah yaitu kambing/domba", "B. tidak sah, karena seharusnya anak laki-laki akikahnya lebih banyak daripada anak perempuan", "C. sah, dengan catatan nilai ayam yang disembelih harganya sama dengan hewan akikah yaitu kambing/domba", "D. tidak sah, karena syarat dan ketentuan hewan akikah adalah hewan ternak yang ditentukan, yaitu kambing atau domba"],
+            correct: 3
+          },
+          {
+            id: 28,
+            text: "Perhatikan ayat QS.surat Al-Hijr ayat 9 berikut ini..\nاِنَّا نَحْنُ نَزَّلْنَا الذِّكْرَ وَاِنَّا لَهٗ لَحٰفِظُوْنَ\nAyat tersebut mengandung pengertian tentang keistimewaan Al-Quran, yaitu...",
+            options: ["A. Terpelihara keautentikannya atau keasliannya", "B. Kandungannya selalu sesuai dengan perkembangan zaman", "C. Keindahan bahasa yang digunakannya", "D. Lengkap isi kandungannya"],
+            correct: 0
+          },
+          {
+            id: 29,
+            text: "Perhatikan ilustrasi berikut!\nSuatu ketika Andi mengikuti salat jenazah atas tetangganya yang meninggal dunia. Pada mulanya salat berjalan lancar. Namun sampai takbir yang ketiga Andi lupa bacaan yang harus dibaca. Bacaan yang seharusnya dibaca Andi adalah ...",
+            options: ["A. اَللَّهُمَّ صَلِّ عَلٰى سَيِّدِنَا مُحَمَّدٍ وَعَلٰى اٰلِ سَيِّدِنَا مُحَمَّدٍ", "B. اَللَّهُمَّ لاَ تَحْرِمْناَ أَجْرَهُ وَلاَ تَفْتِنَا بَعْدَهُ وَاغْفِرْ لَناَ وَلَهُ", "C. اللَّهُمَّ اغْفِرْ لَهُ وَارْحَمْهُ وَعَافِهِ وَاعْفُ عَنْهُ", "D. اُصَلِّى عَلَى هَذَاالْمَيِّتِ اَرْبَعَ تَكْبِرَاتٍ فَرْضَ كِفَايَةِ اِمَامًا| مَأْمُوْمًا ِللهِ تَعَالَى"],
+            correct: 2
+          },
+          {
+            id: 30,
+            text: "Perhatikan gambar di bawah ini!\nMakna yang terkandung dalam gambar di atas adalah....",
+            imageUrl: "https://i.ibb.co.com/fYYGDtNd/Screenshot-2026-04-22-135947.png",
+            options: ["A. Binatang laut akan banyak yang mati karena memakan sampah plastik.", "B. Manusia akan hidup berdampingan dengan sampah di masa yang akan datang.", "C. Cara paling aman untuk megurangi sampah plastik adalah dengan cara didaur ulang", "D. Kerusakan di laut dan di darat sebagai akibat dari perbuatan manusia"],
+            correct: 3
+          },
+          {
+            id: 31,
+            text: "Perhatikan beberapa contoh berikut!\n(1) Beribadah kepada Allah\n(2) Menitipkan barang kepada teman\n(3) Disiplin dalam menjaga kesehatan diri\n(4) Mengembalikan barang yang dipinjam dari teman\n(5) Meminjamkan barang kepada teman yang memerlukan\nContoh perilaku amanah terdapat pada nomor ....",
+            options: ["A. (1), (2), dan (3)", "B. (1), (3), dan (5)", "C. (1), (3), dan (4)", "D. (1), (4), dan (5)"],
+            correct: 2
+          },
+          {
+            id: 32,
+            text: "Perhatikan pernyataan berikut!\n(1) Ada penjual dan pembeli\n(2) Ada obyek yang dijual belikan\n(3) Ada akad ijab kabul\n(4) Ada waktu untuk memilih meneruskan atau membatalkan\nRukun jual beli ditunjukkan oleh nomor ....",
+            options: ["A. (1), (2), dan (3)", "B. (1), (2), dan (4)", "C. (1), (3), dan (4)", "D. (2), (3), dan (4)"],
+            correct: 0
+          },
+          {
+            id: 33,
+            text: "Salah satu peristiwa pada Hari Kiamat adalah bumi diguncangkan dengan dahsyat. Pada hari itu manusia seperti laron yang berterbangan. Ayat yang berkaitan dengan peristiwa tersebut adalah ..",
+            options: ["A. يَوْمَئِذٍ تُحَدِّثُ اَخْبَارَهَاۙ", "B. وَتَكُوْنُ الْجِبَالُ كَالْعِهْنِ الْمَنْفُوْشِۗ", "C. يَوْمَ يَكُوْنُ النَّاسُ كَالْفَرَاشِ الْمَبْثُوْثِۙ", "D. وَمَآ اَدْرٰىكَ مَا الْقَارِعَةُ"],
+            correct: 2
+          },
+          {
+            id: 34,
+            text: "Suasana terasa dingin akibat hujan lebat di luar rumah. Hindun duduk terisak di sisi kakeknya. Sang kakek yang sedang sakit berpesan kepadanya untuk selalu melaksanakan shalat setiap tiba waktunya. Sang kakek merasa perlu berpesan hal tersebut karena Hindun sering lupa waktu saat bekerja. Sang kakek berpesan hal itu karena merasa kiamatnya segera datang menjelang.\nKiamat yang dimaksud sang kakek adalah ....",
+            options: ["A. Malaikat Izrail yang sebentar lagi menjemputnya", "B. Hancurnya alam semesta pada hari kiamat", "C. Banjir yang menghantui saat hujan lebat", "D. Longsor akibat banjir bandang yang melanda kampungnya"],
+            correct: 0
+          },
+          {
+            id: 35,
+            text: "Perhatikan pernyataan-pernyatan berikut!\n1) Syifa rajin membersihkan kelas setiap hari sebelum masuk sekolah.\n2) Ketika jam istirahat, Farhan melaksanakan salat Ḍuha di mushola.\n3) Nisa rajin menabung untuk menyongsong masa depan yang cerah.\n4) Sebagai bendahara kelas, Ira mengelola keuangan dengan amanah.\n5) Falah selalu berhati-hati dalam ucapan dan perbuatannya.\n6) Fauzan selalu menjaga dirinya agar selalu tetap sehat.\nDi antara pernyataan-pernyataan di atas, yang mencerminkan hubungan perilaku seseorang dengan keimanan kepada hari akhir adalah ….",
+            options: ["A. 1, 2, dan 5", "B. 3, 5, dan 6", "C. 2, 4, dan 5", "D. 4, 5, dan 6"],
+            correct: 2
+          },
+          {
+            id: 36,
+            text: "Berikut ini merupakan tanda-tanda datangnya kiamat.\n1) Diturunkannya kembali Nabi Isa bin Maryam\n2) Munculnya Dajjal Laknatullah\n3) Matahari terbit dari arah Barat dan tenggelam di arah Timur\n4) Banyak terjadi gempa bumi, banjir dan bencana alam lainnya\n5) Meninggalnya seseorang\nDari tanda-tanda datangnya kiamat di atas, yang termasuk tanda-tanda kiamat Kubra adalah....",
+            options: ["A. 1, 3, 5", "B. 2, 4, 5", "C. 1, 2, 3", "D. 3, 4, 5"],
+            correct: 2
+          },
+          {
+            id: 37,
+            text: "إِنَّ اللّهَ لاَ يُغَيِّرُ مَا بِقَوْمٍ حَتَّى يُغَيِّرُواْ مَا بِأَنْفُسِهِمْ\n“....Sesungguhnya Allah tidak akan merubah keadaan suatu kaum sebelum mereka mengubah keadaan diri mereka sendiri...” (QS.Ar-Ra’d: 11)\nAyat diatas menerangkan tentang....",
+            options: ["A. Takdir mubram", "B. Takdir muallaq", "C. Ikhtiar", "D. Tawakal"],
+            correct: 2
+          },
+          {
+            id: 38,
+            text: "Proses kejadian setelah hari kiamat meliputi peristiwa berikut...\n1. Hari penimbangan amal (yaumul mizan)\n2. Hari dibangkitkan dari kubur (yaumul ba’as)\n3. Hari penentuan temapat yang baik dan sengsara / surga neraka (yaumul jaza/fasl)\n4. Berkumpul di padang Mahsyar (yaumul mahsyar)\nUrutan proses kejadian setelah hari kiamat yang benar adalah ...",
+            options: ["A. 2, 3, 4 dan 1", "B. 2, 4, 1 dan 3", "C. 1, 2, 3 dan 4", "D. 4, 3, 2 dan 1"],
+            correct: 1
+          },
+          {
+            id: 39,
+            text: "Perhatikan pernyataan berikut ini!\n1. Tanah longsor melanda kampung karangasem. sepuluh orang terluka dan satu tewas di tempat kejadian\n2. Gempa telah menyebabkan tsunami yang melanda Aceh dan menewaskan ratusan ribu orang\n3. Hujan yang turun selama tiga hari tanpa henti menyebabkan banjir bandang melanda kota\n4. Seluruh penduduk di sekitar Gunung merapi mengungsi karena pemerintah telah menetapkan status awas merapi.\nDalam konteks hari akhir kejadian-kejadian diatas merupakan kenyataan yang termasuk dalam kejadian...",
+            options: ["A. Bencana Nasional", "B. Bencana Lokal", "C. Kiamat Kubra", "D. Kiamat Sugra"],
+            correct: 3
+          },
+          {
+            id: 40,
+            text: "Perhatikan tabel berikut!\n1. Nuh as - A. Memiliki kesabaran dan keteguhan dalam menjalani hukuman Raja Namrud\n2. Ibrahim as - B. Melawan Raja Fir’aun yang sangat berkuasa\n3. Musa as - C. Sabar dalam membimbing pengikutnya di tengah tekanan penguasa Romawi\n4. Isa as - D. Sabar berdakwah meskipun tidak banyak yang mengikuti\nPasangan nabi ulul azmi dan keteladanan yang tepat adalah ....",
+            options: ["A. 1-A, 2-C, 3-B, dan 4-D", "B. 1-B, 2-A, 3-D, dan 4-C", "C. 1-C, 2-A, 3-D, dan 4-B", "D. 1-D, 2-A, 3-B, dan 4-C"],
+            correct: 3
+          },
+          {
+            id: 41,
+            text: "Perhatikan pernyataan berikut!\n(1) Didirikan oleh Khalifah Harun al-Rasyid\n(2) Dikembangkan oleh Khalifah al-Makmun\n(3) Awalnya perpustakaan pribadi Khalifah al-Mansur\n(4) Menjadi pusat ilmu pengetahuan dunia pada masa al-Muktasim\nFakta sejarah tentang Bayt al-Ḥikmah ditunjukkan oleh nomor ....",
+            options: ["A. (1), (2), dan (3)", "B. (1), (2), dan (4)", "C. (1), (3), dan (4)", "D. (2), (3), dan (4)"],
+            correct: 0
+          },
+          {
+            id: 42,
+            text: "Perhatikan pernyataan dalam tabel berikut!\n1. Menghina dan menjelek-jelekkan agama lain\n2. Ikut merayakan hari besar keagamaan umat lain\n3. Bergaul dengan semua teman tanpa membeda-bedakan\n4. Tidak memberikan kesempatan teman agama lain untuk beribadah\n5. Membantu teman yang sedang kesulitan tanpa pilih-pilih\n6. Menghargai teman yang berbeda agama saat beribadah\nPernyataan yang menunjukkan moderasi dalam beragama adalah…",
+            options: ["A. 1, 2, 3", "B. 1, 4, 6", "C. 2, 3, 4", "D. 3, 5, 6"],
+            correct: 3
+          },
+          {
+            id: 43,
+            text: "Perhatikan persoalan berikut!\n(1) Ibadah\n(2) Akidah\n(3) Muamalah\n(4) Kemanusiaan\n(5) Sosial kemasyarakatan\nKerjasama antar umat beragama yang diperbolehkan berhubungan dengan persoalan nomor ...",
+            options: ["A. (1), (2), dan (3)", "B. (2), (3), dan (4)", "C. (2), (3), dan (5)", "D. (3), (4), dan (5)"],
+            correct: 3
+          },
+          {
+            id: 44,
+            text: "Perhatikan potongan ayat berikut ...\n1. وَسَخَّرَ لَكُمُ الْاَنْهٰرَ\n2. اَللّٰهُ الَّذِيْ خَلَقَ السَّمٰوٰتِ وَالْاَرْضَ\n3. وَسَخَّرَ لَكُمُ الْفُلْكَ لِتَجْرِيَ فِى الْبَحْرِ بِاَمْرِهٖ\n4. وَاَنْزَلَ مِنَ السَّمَاۤءِ مَاۤءً فَاَخْرَجَ بِهٖ مِنَ الثَّمَرٰتِ رِزْقًا لَّكُمْ\nUrutan bacaan QS.Ibrahim ayat 32 yang benar adalah ...",
+            options: ["A. 1 – 3 – 4 – 2", "B. 3 – 1 – 4 – 2", "C. 2 – 4 – 3 – 1", "D. 4 – 3 - 2 - 1"],
+            correct: 2
+          },
+          {
+            id: 45,
+            text: "Ketika kita membuat status atau memberikan komentar terhadap pernyataan orang lain di media sosial, bisa jadi menimbulkan salah paham bagi orang yang membacanya. Berikut beberapa etika yang harus kalian lakukan.\n1) Hindari tempat-tempat yang sepi\n2) Menggunakan bahasa yang santun\n3) Bertanggung jawab atas status atau komentar\n4) Memberikan respons dengan kata-kata yang baik\n5) Berbicara atau menyampaikan informasi yang benar\n6) Saling mengingatkan dalam kebaikan satu sama lain\n7) Mendoakan agar teman-teman senantiasa dalam kebaikan\nYang termasuk etika dalam komunikasi melalui media sosial ditunjukkan oleh...",
+            options: ["A. 1, 2, 3, 4", "B. 2, 3, 4, 5", "C. 3, 4, 5, 6", "D. 4, 5, 6, 7"],
+            correct: 1
+          },
+          {
+            id: 46,
+            text: "Seseorang disebut mempunyai etika jika kebiasaan yang dilakukan sesuai dengan ketentuan yang berlaku. Pernyataan berikut, yang merupakan etika pergaulan Islami yang paling tepat adalah ….",
+            options: ["A. Pergaulan seorang muslim dengan senantiasa membahas urusan agama Islam", "B. Pergaulan dengan berpedoman pada norma-norma Al-Qur’an dan hadis serta hadis Nabi Muhammad saw.", "C. Pergaulan yang dilaksanakan khusus dikalangan umat Islam yang memberikan dampak kemajuan Islam", "D. Pergaulan yang bertujuan menyatukan umat Islam dalam kehidupan sehari-hari"],
+            correct: 1
+          },
+          {
+            id: 47,
+            text: "Perhatikan cerita singkat berikut!\nHidayah merupakan anak salehah, rajin, pintar dan aktif berorganisasi. Suatu ketika dia berupaya datang tepat waktu menghadiri undangan rapat bersama dengan teman-teman pengurus OSIS lainnya. Dia persiapkan semuanya, dan tidak lupa dia memakai jilbab kebanggaannya.\nBerdasarkan cerita singkat di atas, Hidayah telah mengamalkan adab bergaul dengan lawan jenis yaitu ….",
+            options: ["A. Menjaga pandangan terhadap lawan jenis", "B. Persiapan rapat secara Islami", "C. Menutup aurat dengan jilbabnya", "D. Menghadiri undangan tepat waktu"],
+            correct: 2
+          },
+          {
+            id: 48,
+            text: "Perhatikan gambar dibawah ini..\nMakna yang terkandung dalam gambar diatas adalah ....",
+            imageUrl: "https://i.ibb.co.com/9mfbDVbx/Screenshot-2026-04-22-133437.png",
+            options: ["A. Budayakan tabayun", "B. Kebebasan dalam berpendapat", "C. Kebebasan informasi", "D. Mencari sumber berita"],
+            correct: 0
+          },
+          {
+            id: 49,
+            text: "Perhatikan pernyataan berikut!\n1. Berhati-hati dalam menerima berita\n2. Menghargai orang lain sehingga tidak terjadi kesalah pahaman\n3. Menciptakan kerukunan dan kedamaian didalam masyarakat\n4. Kelalaian dalam kewajiban agama\n5. Persatuan dan kesatuan dapat terjaga\nDi atas merupakan beberapa manfaat dari tabayun, yang bukan termasuk dari manfaat dari tabayun adalah ….",
+            options: ["A. 1", "B. 3", "C. 2", "D. 4"],
+            correct: 3
+          },
+          {
+            id: 50,
+            text: "Rahmah mendapatkan pesan dari orang yang tidak dikenal melalui pesan pada salah satu media sosial bahwa salah satu anggota keluarga mengalami musibah. Ia di rawat di rumah sakit. Di akhir pesan tersebut, Rahmah harus segera mentransfer uang ke nomor rekening salah satu bank. Sikap yang tepat dilakukan Rahmah adalah .…",
+            options: ["A. Mengecek terlebih dahulu anggota keluarga yang terkena musibah", "B. Mengirim langsung uang ke nomor rekening tersebut", "C. Memblokir nomor yang tidak dikenal", "D. panik, menangis dengan histeris"],
+            correct: 0
+          }
+        ];
+
+        const SCHOOL_LOGO_URL = "https://i.ibb.co.com/Kxpk1Q54/Screenshot-2024-08-29-125749.png";
+
+        function App() {
+          const [step, setStep] = useState('login');
+          const [student, setStudent] = useState({ nama: '', jk: 'L', kelas: '9.1', token: '' }); 
+          const [answers, setAnswers] = useState({});
+          const [cheatCount, setCheatCount] = useState(0);
+          const [showCheatWarning, setShowCheatWarning] = useState(false);
+          const [showConfirmSubmit, setShowConfirmSubmit] = useState(false);
+          const [isSubmitting, setIsSubmitting] = useState(false);
+          const [errorMsg, setErrorMsg] = useState('');
+          const [finalScore, setFinalScore] = useState(null);
+
+          // ---------------------------------------------------------
+          // LINK GOOGLE APPS SCRIPT ANDA
+          // ---------------------------------------------------------
+          const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbws8RRG7iR_zq1T1eDugXx4kzKKu4LhTiAcViijN6kqHOqtEvG9k6gXHLo7z761l2j3/exec";
+
+          useEffect(() => {
+            const handleVisibilityChange = () => {
+              if (document.hidden && step === 'exam') {
+                setCheatCount((prev) => prev + 1);
+                setShowCheatWarning(true);
+              }
+            };
+            document.addEventListener("visibilitychange", handleVisibilityChange);
+            return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+          }, [step]);
+
+          const handleLogin = (e) => {
+            e.preventDefault();
+            if (!student.nama.trim()) {
+              setErrorMsg('Nama lengkap wajib diisi!');
+              return;
+            }
+            
+            if (student.token !== 'PAI2026') {
+              setErrorMsg('Token ujian salah! Silakan periksa kembali.');
+              return;
+            }
+
+            setErrorMsg('');
+            setStep('exam');
+            document.documentElement.requestFullscreen().catch((err) => {
+              console.log("Fullscreen ditolak:", err);
+            });
+          };
+
+          const handleAnswer = (qIndex, optIndex) => {
+            setAnswers({ ...answers, [qIndex]: optIndex });
+          };
+
+          const submitExam = async () => {
+            setIsSubmitting(true);
+            
+            let score = 0;
+            let analisisSoal = [];
+            let jawabanHuruf = [];
+            const opsiHuruf = ['A', 'B', 'C', 'D'];
+
+            QUESTIONS.forEach((q, index) => {
+              let ansIdx = answers[index];
+              if (ansIdx === q.correct) {
+                score += 2;
+                analisisSoal.push(1); 
+              } else {
+                analisisSoal.push(0); 
+              }
+              jawabanHuruf.push(ansIdx !== undefined ? opsiHuruf[ansIdx] : '-'); 
+            });
+            
+            score = score - (cheatCount * 2);
+            score = Math.max(0, score);
+            setFinalScore(score);
+
+            const payload = {
+              nama: student.nama,
+              jenisKelamin: student.jk,
+              kelas: student.kelas,
+              nilai: score,
+              kecurangan: cheatCount,
+              jawabanHuruf: jawabanHuruf, 
+              analisis: analisisSoal      
+            };
+
+            const formData = new URLSearchParams();
+            formData.append("data", JSON.stringify(payload));
+
+            try {
+              await fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                  "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: formData,
+              });
+              
+              setStep('finished');
+            } catch (error) {
+              alert("Terjadi kesalahan jaringan saat mengirim data. Coba lagi.");
+              setIsSubmitting(false);
+            }
+          };
+
+          if (step === 'login') {
+            return (
+              <div className="min-h-screen bg-green-50 flex items-center justify-center p-4">
+                <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border-t-8 border-green-600">
+                  <div className="text-center mb-6">
+                    <img src={SCHOOL_LOGO_URL} alt="Logo Sekolah" className="w-24 h-24 mx-auto mb-4 object-contain drop-shadow-sm" />
+                    <h1 className="text-xl font-bold text-gray-800">UJIAN SEKOLAH</h1>
+                    <h2 className="text-sm font-semibold text-gray-600">TAHUN AJARAN 2025/2026</h2>
+                    <h3 className="text-md font-bold text-green-700 mt-2">SMP NEGERI 1 KARIMUN</h3>
+                    <p className="text-sm text-gray-500">Bidang Studi: Pendidikan Agama Islam</p>
+                  </div>
+
+                  <form onSubmit={handleLogin} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                      <input type="text" value={student.nama} onChange={(e) => setStudent({...student, nama: e.target.value})} className="w-full border border-gray-300 px-4 py-2 rounded-md focus:ring-green-500 focus:border-green-500" placeholder="Masukkan nama lengkap..." />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Jenis Kelamin</label>
+                        <select value={student.jk} onChange={(e) => setStudent({...student, jk: e.target.value})} className="w-full border border-gray-300 px-4 py-2 rounded-md focus:ring-green-500 focus:border-green-500">
+                          <option value="L">Laki-laki</option>
+                          <option value="P">Perempuan</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Kelas</label>
+                        <select value={student.kelas} onChange={(e) => setStudent({...student, kelas: e.target.value})} className="w-full border border-gray-300 px-4 py-2 rounded-md focus:ring-green-500 focus:border-green-500">
+                          {['9.1', '9.2', '9.3', '9.4', '9.5', '9.6', '9.7', '9.8'].map(k => (
+                            <option key={k} value={k}>{k}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Token Ujian</label>
+                      <input type="text" value={student.token} onChange={(e) => setStudent({...student, token: e.target.value})} className="w-full border border-gray-300 px-4 py-2 rounded-md focus:ring-green-500 focus:border-green-500 font-mono tracking-widest uppercase" placeholder="Masukkan token..." autoComplete="off" />
+                    </div>
+
+                    {errorMsg && <p className="text-red-500 text-sm text-center font-semibold bg-red-50 p-2 rounded">{errorMsg}</p>}
+                    <button type="submit" className="w-full bg-green-600 text-white font-bold py-3 rounded-md hover:bg-green-700 transition">
+                      MULAI UJIAN
+                    </button>
+                  </form>
+                </div>
+              </div>
+            );
+          }
+
+          if (step === 'finished') {
+            return (
+              <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+                <div className="bg-white p-8 rounded-xl shadow-lg text-center max-w-md">
+                  <div className="text-5xl text-green-500 mb-4">✓</div>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-2">Ujian Selesai</h2>
+                  <p className="text-gray-600 mb-4">Terima kasih {student.nama}, jawaban Anda telah berhasil direkam ke dalam sistem.</p>
+                  
+                  <div className="bg-gray-50 border p-4 rounded-lg mb-6">
+                     <p className="text-sm text-gray-500 uppercase font-semibold">Total Nilai Anda (Maks 100)</p>
+                     <p className="text-4xl font-bold text-green-600 mt-1">{finalScore}</p>
+                     {cheatCount > 0 && (
+                       <p className="text-xs text-red-500 mt-2 bg-red-50 p-2 rounded">
+                         ⚠️ Dikurangi {cheatCount * 2} poin karena terdeteksi {cheatCount}x indikasi kecurangan.
+                       </p>
+                     )}
+                  </div>
+                  <p className="text-sm text-gray-400">Silahkan tutup halaman ini atau kembalikan perangkat kepada pengawas.</p>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div className="flex flex-col md:flex-row h-screen bg-gray-50 font-sans">
+              {showCheatWarning && (
+                <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+                  <div className="bg-white p-8 rounded-xl shadow-2xl max-w-sm text-center border-t-8 border-red-600">
+                    <h2 className="text-2xl font-bold text-red-600 mb-2">PERINGATAN!</h2>
+                    <p className="text-gray-700 mb-6">Anda terdeteksi meninggalkan halaman ujian. Kecurangan ke-{cheatCount} telah dicatat dan akan mengurangi nilai akhir.</p>
+                    <button onClick={() => setShowCheatWarning(false)} className="bg-red-600 text-white px-6 py-2 rounded-md font-bold hover:bg-red-700">Saya Mengerti</button>
+                  </div>
+                </div>
+              )}
+
+              {showConfirmSubmit && (
+                <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+                  <div className="bg-white p-6 rounded-xl shadow-xl max-w-sm text-center">
+                    <h2 className="text-xl font-bold text-gray-800 mb-2">Kirim Jawaban?</h2>
+                    <p className="text-gray-600 mb-6">Pastikan semua soal telah dijawab. Anda tidak bisa kembali setelah menekan tombol kirim.</p>
+                    <div className="flex justify-center space-x-4">
+                      <button onClick={() => setShowConfirmSubmit(false)} className="px-4 py-2 border border-gray-300 rounded text-gray-600 font-semibold hover:bg-gray-100" disabled={isSubmitting}>Batal</button>
+                      <button onClick={submitExam} className="px-4 py-2 bg-green-600 rounded text-white font-semibold hover:bg-green-700 flex items-center" disabled={isSubmitting}>
+                        {isSubmitting ? "Mengirim..." : "Ya, Kirim Sekarang"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex-1 p-4 md:p-8 flex flex-col h-screen overflow-y-auto">
+                <div className="bg-white rounded-lg shadow-sm p-4 mb-4 flex justify-between items-center border-b-4 border-green-600">
+                  <div className="flex items-center space-x-4">
+                    <img src={SCHOOL_LOGO_URL} alt="Logo Sekolah" className="w-12 h-12 object-contain hidden sm:block drop-shadow-sm" />
+                    <div>
+                      <h2 className="font-bold text-gray-800">{student.nama} - Kelas {student.kelas}</h2>
+                      <p className="text-xs text-gray-500">Pendidikan Agama Islam</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="bg-red-100 text-red-800 text-xs font-semibold px-2 py-1 rounded">
+                      Peringatan: {cheatCount}x
+                    </span>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-lg shadow-md p-6 flex-1">
+                  {QUESTIONS.map((q, index) => (
+                    <div key={q.id} id={`soal-${index}`} className="mb-10 border-b pb-6 last:border-0">
+                      <div className="flex space-x-4 mb-4">
+                        <span className="font-bold text-lg">{index + 1}.</span>
+                        <div className="flex-1">
+                          {q.imageUrl && <img src={q.imageUrl} alt="Ilustrasi Soal" className="mb-4 max-w-full h-auto rounded border" />}
+                          <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">{q.text}</p>
+                        </div>
+                      </div>
+                      <div className="pl-8 space-y-2">
+                        {q.options.map((opt, optIndex) => (
+                          <label key={optIndex} className={`flex items-start space-x-3 p-3 rounded-lg border cursor-pointer transition-colors ${answers[index] === optIndex ? 'bg-green-50 border-green-500' : 'hover:bg-gray-50 border-gray-200'}`}>
+                            <input type="radio" name={`question-${index}`} className="mt-1 w-4 h-4 text-green-600 focus:ring-green-500" checked={answers[index] === optIndex} onChange={() => handleAnswer(index, optIndex)} />
+                            <span className="text-gray-700 whitespace-pre-wrap">{opt}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="w-full md:w-80 bg-white border-l shadow-lg flex flex-col h-screen hidden md:flex">
+                <div className="p-4 bg-gray-800 text-white text-center">
+                  <h3 className="font-bold">Navigasi Soal</h3>
+                  <p className="text-xs text-gray-300">Total: 50 Soal</p>
+                </div>
+                <div className="flex-1 p-4 overflow-y-auto">
+                  <div className="grid grid-cols-5 gap-2">
+                    {QUESTIONS.map((_, i) => {
+                      const isAnswered = answers[i] !== undefined;
+                      return (
+                        <button key={i} onClick={() => document.getElementById(`soal-${i}`).scrollIntoView({ behavior: 'smooth' })} className={`w-10 h-10 rounded text-sm font-bold border transition ${isAnswered ? 'bg-green-500 text-white border-green-600' : 'bg-gray-100 text-gray-600 border-gray-300 hover:bg-gray-200'}`}>
+                          {i + 1}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="p-4 border-t bg-gray-50">
+                  <button onClick={() => setShowConfirmSubmit(true)} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded shadow transition">
+                    KIRIM JAWABAN
+                  </button>
+                </div>
+              </div>
+
+              <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-white border-t shadow-lg">
+                <button onClick={() => setShowConfirmSubmit(true)} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded shadow transition">
+                  KIRIM JAWABAN
+                </button>
+              </div>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
